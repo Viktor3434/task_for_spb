@@ -1,0 +1,48 @@
+---
+tomcat_archive_url: https://archive.apache.org/dist/tomcat/tomcat-9/v{{ tomcat_ver }}/bin/apache-tomcat-{{ tomcat_ver }}.tar.gz
+tomcat_archive_dest: /tmp/apache-tomcat-{{ tomcat_ver }}.tar.gz
+
+jenkins_war_archive: https://get.jenkins.io/war-stable/2.346.1/jenkins.war
+jenkins_archive_dest: /usr/share/tomcat/webapps
+
+epel_repo_gpg_key_url: "https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"
+
+
+
+nginx_package_name: "nginx"
+
+nginx_service_state: started
+nginx_service_enabled: true
+nginx_conf_template: "nginx.conf.j2"
+nginx_vhost_template: "vhost.j2"
+nginx_remove_default_vhost: true
+nginx_listen_ipv6: true
+nginx_yum_repo_enabled: false
+
+nginx_vhosts:
+  - listen: "80"
+    server_name_redirect: "_"
+    server_name: "127.0.0.1"
+    filename: proxy.conf
+
+nginx_worker_processes: "auto"
+nginx_pidfile: /run/nginx.pid
+include_modules: "/usr/share/nginx/modules/*.conf"
+nginx_worker_connections: "1024"
+sendfile: "on"
+tcp_nopush: "on"
+tcp_nodelay: "on"
+keepalive_timeout: "65"
+types_hash_max_size: "2048"
+nginx_log_format: |-
+  '$remote_addr - $remote_user [$time_local] "$request" '
+  '$status $body_bytes_sent "$http_referer" '
+  '"$http_user_agent" "$http_x_forwarded_for"'
+
+access_log: /var/log/nginx/access.log
+error_log: /var/log/nginx/error.log
+
+include_vhost: "/etc/nginx/conf.d/*.conf"
+
+

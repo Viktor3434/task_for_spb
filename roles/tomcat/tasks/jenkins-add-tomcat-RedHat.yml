@@ -1,0 +1,20 @@
+- name: Download Jenkins
+  get_url:
+    url: "{{ jenkins_war_archive }}"
+    dest: "{{ jenkins_archive_dest }}"
+
+- name: sleep - unzip archive jenkins
+  command: sleep 7
+
+- name: stat jenkins
+  stat: path={{ jenkins_archive_dest }}/jenkins
+  register: foo_stat
+
+- name: save default page
+  command: mv {{ jenkins_archive_dest }}/ROOT  {{ jenkins_archive_dest }}/ROOT.old
+  when: foo_stat.stat.exists
+
+- name: add jenkins
+  command: mv {{ jenkins_archive_dest }}/jenkins  {{ jenkins_archive_dest }}/ROOT
+  when: foo_stat.stat.exists
+

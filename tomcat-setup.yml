@@ -1,0 +1,11 @@
+---
+- name: Tomcat deployment playbook
+  hosts: target             # Inventory hosts group / server to act on
+  become: yes               # If to escalate privilege
+  become_method: sudo       # Set become method
+  remote_user: root         # Update username for remote server
+  vars:
+    tomcat_ver: 9.0.63                          # Tomcat version to install
+  roles:
+    - tomcat
+

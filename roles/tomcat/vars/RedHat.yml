@@ -1,0 +1,24 @@
+#tomcat vars
+JAVA_HOME: /usr/lib/jvm/jre
+
+
+#nginx vars
+root_group: root
+nginx_conf_path: /etc/nginx/conf.d
+nginx_conf_file_path: /etc/nginx/nginx.conf
+nginx_mime_file_path: /etc/nginx/mime.types
+nginx_pidfile: /var/run/nginx.pid
+nginx_vhost_path: /etc/nginx/conf.d
+nginx_default_vhost_path: /etc/nginx/conf.d/default.conf
+
+nginx_user: "tomcat"
+root_location: /usr/share/tomcat/webapps/ROOT/
+
+#cron vars
+cron_script_template: "cron-script.sh.j2"
+cron_script_file_name: cron-script.sh
+cron_script_file_dir: /root/bin
+backup_dir: /backup
+backup_fname: "backup.tar.zip"
+backup_src: "/etc/nginx/nginx.conf /etc/nginx/conf.d/*"
+

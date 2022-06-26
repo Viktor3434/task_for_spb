@@ -1,0 +1,18 @@
+---
+- name: Add the OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_os_family }}.yml"
+
+- include_tasks: "tomcat-setup-{{ ansible_os_family }}.yml"
+
+- include_tasks: "jenkins-add-tomcat-{{ ansible_os_family }}.yml"
+
+- include_tasks: "firewall-setup-{{ ansible_os_family }}.yml"
+
+- include_tasks: "SELinux-setup-{{ ansible_os_family }}.yml"
+
+- include_tasks: "nginx-setup-{{ ansible_os_family }}.yml"
+
+- include_tasks: "crontask-add-{{ ansible_os_family }}.yml"

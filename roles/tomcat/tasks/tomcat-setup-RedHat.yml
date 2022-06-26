@@ -1,0 +1,82 @@
+- name: Check if EPEL repo is already configured.
+  stat:
+    path: "{{ epel_repofile_path }}"
+  register: epel_repofile_result
+  when: ansible_facts['distribution_major_version'] == '8'
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: "{{ epel_repo_gpg_key_url }}"
+    state: present
+#  when: not epel_repofile_result.stat.exists and ansible_facts['distribution_major_version'] == '8'
+
+- name: clear dnf cache
+  command: dnf clean all
+  become: True
+  when: ansible_facts['os_family'] == 'RedHat' and ansible_facts['distribution_major_version'] == '8'
+
+- name: Install basic packages
+  package:
+    name: ['wget','unzip','curl','tar','unzip']
+    state: present
+
+- name: Add EPEL repository
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install Java 8 CentOS
+  yum:
+    name: java-1.8.0-openjdk
+    state: present
+
+- name: Add tomcat group
+  group:
+    name: tomcat
+
+- name: Add "tomcat" user
+  user:
+    name: tomcat
+    group: tomcat
+    home: /usr/share/tomcat
+    createhome: no
+    system: yes
+
+- name: Download Tomcat
+  get_url:
+    url: "{{ tomcat_archive_url }}"
+    dest: "{{ tomcat_archive_dest }}"
+
+- name: Create a tomcat directory
+  file:
+    path: /usr/share/tomcat
+    state: directory
+    owner: tomcat
+    group: tomcat
+
+- name: Extract tomcat archive
+  unarchive:
+    src: "{{ tomcat_archive_dest }}"
+    dest: /usr/share/tomcat
+    owner: tomcat
+    group: tomcat
+    remote_src: yes
+    extra_opts: "--strip-components=1"
+    creates: /usr/share/tomcat/bin
+
+- name: Copy tomcat service file
+  template:
+    src: templates/tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+  when: ansible_service_mgr == "systemd"
+
+- name: "replace config with sed - tomcat listen localhost only"
+  shell:  sed --follow-symlinks -i -e '/<Connector port="8080" protocol="HTTP\/1.1"/s/^.*$/    <Connector address="127.0.0.1" port="8080" protocol="HTTP\/1.1"/' /usr/share/tomcat/conf/server.xml
+
+- name: Start and enable tomcat
+  service:
+    daemon_reload: yes
+    name: tomcat
+    state: started
+    enabled: yes
+  when: ansible_service_mgr == "systemd"

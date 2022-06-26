@@ -1,0 +1,18 @@
+{% block server_redirect %}
+{% if item.server_name_redirect is defined %}
+server {
+    listen       {{ item.listen | default('80') }};
+{% if nginx_listen_ipv6 %}
+    listen       [::]:{{item.listen | default('80') }};
+{% endif %}
+    server_name  {{ item.server_name_redirect }};
+    root {{ root_location }};
+  location / {
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Server $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_pass http://{{ item.server_name }}:8080/; 
+  }
+}
+{% endif %}
+{% endblock %}

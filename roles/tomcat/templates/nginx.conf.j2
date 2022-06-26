@@ -1,0 +1,41 @@
+{% block nginx_default %}
+user {{ nginx_user }};
+worker_processes {{ nginx_worker_processes }};
+pid  {{ nginx_pidfile }};
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections {{ nginx_worker_connections }};
+}
+{% endblock %}
+
+
+http {
+{% block http_basic %}
+    ##
+    # Default conf
+    ##
+
+    sendfile            {{ sendfile }};
+    tcp_nopush          {{ tcp_nopush}};
+    tcp_nodelay         {{ tcp_nodelay}};
+    keepalive_timeout   {{ keepalive_timeout}};
+    types_hash_max_size {{ types_hash_max_size}};
+
+    include             {{ nginx_mime_file_path }};
+    default_type        application/octet-stream;
+
+
+    ##
+    # Logging Settings
+    ##
+    log_format  main  {{ nginx_log_format|indent(23) }};
+    access_log  {{ access_log }}  main;
+    error_log {{ error_log }};
+
+
+    include {{ include_vhost }};
+
+{% endblock %}
+
+}

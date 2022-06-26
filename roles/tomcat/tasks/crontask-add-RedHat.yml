@@ -1,0 +1,30 @@
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ cron_script_file_dir }}"
+    state: directory
+    mode: '0744'
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: "{{ backup_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Copy bacup script.
+  template:
+    src: "{{ cron_script_template }}"
+    dest: "{{ cron_script_file_dir }}/{{ cron_script_file_name }}"
+    owner: root
+    group: "{{ root_group }}"
+    mode: 0700
+
+- name: "Cronjob Entry"
+  cron:
+    name: "bacup script"
+    minute: 0
+    hour: 0
+    day: "*"
+    month: "*"
+    weekday: "*"
+    job: "{{ cron_script_file_dir }}/{{ cron_script_file_name }}"
